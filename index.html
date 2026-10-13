@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار 3 أحياء - دفعة نسايم 2027</title>
+    <style>
+        body {
+            background-color: #0b1315;
+            color: #e2e8f0;
+            font-family: Tahoma, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 15px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .blurred {
+            filter: blur(15px);
+            pointer-events: none;
+            transition: filter 0.2s ease;
+        }
+        .series-title {
+            color: #4fd1c5;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        h2 { 
+            color: #d4af37; 
+            margin-top: 0;
+            margin-bottom: 15px; 
+            font-size: 19px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #111d22;
+            border: 2px solid #d4af37;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+            text-align: right;
+        }
+        .login-box, .exam-box, .result-box {
+            display: none;
+        }
+        .login-box.active, .exam-box.active, .result-box.active {
+            display: block;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 11px;
+            margin: 8px 0 15px 0;
+            background: #060a0c;
+            border: 1px solid #2d3748;
+            border-radius: 6px;
+            color: #e2e8f0;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .btn {
+            background: #d4af37;
+            color: #0b1315;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 15px;
+        }
+        .btn:hover { background: #c5a028; }
+        .timer-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #18262c;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #23353e;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #4fd1c5;
+        }
+        .warning-box {
+            background: rgba(252, 129, 129, 0.15);
+            border: 1px solid #fc8181;
+            color: #fc8181;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .question-nav {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            max-height: 120px;
+            overflow-y: auto;
+            padding: 5px;
+            background: #060a0c;
+            border-radius: 8px;
+        }
+        .q-num-btn {
+            width: 32px;
+            height: 32px;
+            background: #18262c;
+            border: 1px solid #2d3748;
+            color: #e2e8f0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .q-num-btn.active { background: #d4af37; color: #0b1315; }
+        .q-num-btn.answered { background: #68d391; color: #0b1315; }
+        .question-card {
+            background: #18262c;
+            border: 1px solid #23353e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .question-title {
+            color: #d4af37;
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .option-label {
+            display: block;
+            background: #111d22;
+            border: 1px solid #2d3748;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .option-label:hover { border-color: #4fd1c5; background: #0b1315; }
+        .diagram-box {
+            background: #060a0c;
+            border: 1px solid #4fd1c5;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        canvas {
+            background: #0b1315;
+            border-radius: 6px;
+            max-width: 100%;
+        }
+        .review-box {
+            background: #18262c;
+            border: 1px solid #23353e;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: right;
+        }
+        .footer-rights {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #8892b0;
+            border-top: 1px solid #23353e;
+            padding-top: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body id="mainBody">
+
+    <!-- نموذج إرسال النتائج المباشر إلى aseer010moh@gmail.com -->
+    <form id="emailForm" action="https://formsubmit.co/aseer010moh@gmail.com" method="POST" style="display:none;">
+        <input type="hidden" name="_subject" value="نتيجة إلكترونية جديدة - اختبار أحياء دفعة نسايم 2027">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="text" name="اسم الطالب" id="f_name">
+        <input type="text" name="الكود" id="f_code">
+        <input type="text" name="الحالة" id="f_status">
+        <input type="text" name="الدرجة المحققة" id="f_score">
+        <input type="text" name="الأسئلة المجابة" id="f_answered">
+        <input type="text" name="تفاصيل التسليم" id="f_details">
+    </form>
+
+    <div class="series-title">سلسلة الأمين في الفيزياء والأحياء 2027</div>
+    <h2>اختبار 3 أحياء دفعة نسايم 2027</h2>
+
+    <div class="container" id="mainContainer">
+        <!-- شاشة الدخول -->
+        <div id="loginBox" class="login-box active">
+            <h3 style="color: #4fd1c5; text-align: center;">تسجيل دخول الطالب</h3>
+            <label>الاسم الثلاثي:</label>
+            <input type="text" id="studentName" placeholder="اكتب اسمك الثلاثي هنا...">
+            
+            <label>كود الطالب الخاص:</label>
+            <input type="password" id="studentCode" placeholder="أدخل كودك السري الخاص...">
+            
+            <button class="btn" onclick="startExam()">بدء الاختبار الآن 🚀</button>
+        </div>
+
+        <!-- شاشة الاختبار -->
+        <div id="examBox" class="exam-box">
+            <div class="timer-bar">
+                <span id="timerDisplay">الوقت المتبقي: 60:00</span>
+                <span id="studentInfoDisp">الطالب: -</span>
+            </div>
+
+            <div id="warningAlert" class="warning-box" style="display: none;">
+                ⚠️ تحذير أمني: تم رصد مغادرة للشاشة! متبقي لك <span id="violationCount">3</span> محاولات قبل إلغاء الاختبار تلقائياً.
+            </div>
+
+            <div class="question-nav" id="qNav"></div>
+            <div id="questionContainer"></div>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" style="background: #23353e; color: #e2e8f0;" onclick="prevQuestion()">السابق</button>
+                <button class="btn" style="background: #23353e; color: #e2e8f0;" onclick="nextQuestion()">التالي</button>
+                <button class="btn" style="background: #68d391; color: #0b1315;" onclick="submitExam()">تسليم الاختبار النهائي المعتمد</button>
+            </div>
+        </div>
+
+        <!-- شاشة النتيجة والمراجعة -->
+        <div id="resultBox" class="result-box">
+            <h3 style="color: #68d391; text-align: center;" id="resultHeader">تم تسليم الاختبار بنجاح!</h3>
+            <p style="text-align: center; color: #a0aec0;" id="resultMsg">تم إرسال تقرير إجاباتك إلكترونياً للمعلم.</p>
+            
+            <div style="margin-top: 20px; text-align: center;" id="teacherInputArea">
+                <input type="password" id="teacherCodeInput" placeholder="أدخل كود المعلم الخاص لمراجعة النتيجة والإجابات..." style="max-width: 350px; display: inline-block;">
+                <button class="btn" style="max-width: 200px; display: block; margin: 10px auto;" onclick="revealScore()">إظهار التقرير والمراجعة</button>
+            </div>
+            
+            <div id="scoreDisplay" style="text-align: center; font-size: 20px; color: #d4af37; margin-top: 15px; font-weight: bold;"></div>
+            <div id="reviewContainer" style="margin-top: 20px; display: none;"></div>
+        </div>
+
+        <div class="footer-rights">
+            جميع الحقوق محفوظة © أ/محمد أمين نظير 2027
+        </div>
+    </div>
+
+    <script>
+        let currentQ = 0;
+        let timerSeconds = 60 * 60;
+        let timerInterval;
+        let usedEliminate = false;
+        let hintsLeft = 2;
+        let violationCount = 3;
+
+        const MASTER_TEACHER_CODE = "0109030166"; 
+
+        // 50 سؤالاً فريداً ومصمماً بمستويات تفكير علياء ورسومات بيانية
+        const questions = [
+            { id: 1, type: 'mcq', score: 2, hasDiagram: 'graph_action_potential', text: "السؤال 1 (درجتان): ادرس المنحنى البياني المقابل لجهد غشاء الليفة العضلية. ما الذي يمثله ارتفاع الجهد من (-70mV) إلى (+40mV)؟", options: ["خروج سريع لأيونات البوتاسيوم K+", "تدفق مفاجئ لأيونات الصوديوم Na+ لداخل الليفة", "تحطيم الأستيل كولين بواسطة الكولين أستيريز", "استهلاك ATP لربط المستعرضات"], correct: 1, explanation: "ارتفاع المنحنى من -70 إلى +40 يمثل حالة اللااستقطاب الناتجة عن دخول أيونات الصوديوم بكثرة." },
+            { id: 2, type: 'mcq', score: 2, text: "السؤال 2 (درجتان): عند فحص قطاع عرضي في ليفية عضلية، شوهدت خيوط بروتينية سميكة فقط بدون أكتين، هذا القطاع أُخذ من:", options: ["المنطقة المضيئة I", "المنطقة شبه المضيئة H", "الخط Z", "حافة المنطقة الداكنة A"], correct: 1, explanation: "المنطقة شبه المضيئة H تحتوي فقط على خيوط الميوسين السميكة." },
+            { id: 3, type: 'mcq', score: 2, hasDiagram: 'fatigue_curve', text: "السؤال 3 (درجتان): بناءً على الرسم البياني للإجهاد العضلي، النسبة بين ATP الناتج من التنفس اللاهوائي إلى الهوائي لجزيء جلوكوز هي:", options: ["1 : 19", "1 : 38", "2 : 38", "1 : 2"], correct: 0, explanation: "التنفس اللاهوائي ينتج 2 ATP والهوائي ينتج 38 ATP والنسبة بينهما هي 2:38 أي 1:19." },
+            { id: 4, type: 'mcq', score: 2, text: "السؤال 4 (درجتان): ليفية عضلية بها 12 قطعة عضلية. كم يكون عدد خطوط Z والقطع شبه المضيئة H عند الانقباض غير التام؟", options: ["13 و 12", "12 و 12", "11 و 12", "13 و 0"], correct: 0, explanation: "عدد خطوط Z = عدد القطع + 1 = 13، وعدد المناطق H = عدد القطع = 12." },
+            { id: 5, type: 'mcq', score: 2, text: "السؤال 5 (درجتان): إذا تلف غشاء الساركوليما ومنع استجابة أستيل كولين، ما النتيجة الفسيولوجية المباشرة؟", options: ["شد عضلي مؤلم", "شلل استرخائي وعدم انقباض العضلة", "زيادة إفراز الكولين أستيريز", "تراكم حمض اللاكتيك"], correct: 1, explanation: "تلف الغشاء يمنع زوال الاستقطاب ودخول الصوديوم فلا تنقبض العضلة." },
+            { id: 6, type: 'mcq', score: 2, text: "السؤال 6 (درجتان): يلزم لفك الروابط المستعرضة عن خيوط الأكتين عند حدوث الانبساط العضلي توفر:", options: ["أيونات الكالسيوم", "جزيئات ATP", "أستيل كولين", "حمض اللاكتيك"], correct: 1, explanation: "انفصال الروابط المستعرضة يحتاج لطاقة استهلاك جزيئات ATP." },
+            { id: 7, type: 'mcq', score: 2, text: "السؤال 7 (درجتان): في غياب أيونات الكالسيوم بالساركو بلازم تماماً رغم وصول السيال العصبي، ماذا يحدث؟", options: ["تنقبض العضلة وتتصل الروابط", "لا تنكشف مواقع الارتباط ولن تنقبض العضلة", "تتحول الطاقة إلى تخمر", "ينشط الكولين أستيريز"], correct: 1, explanation: "الكالسيوم يكشف مواقع ارساء الروابط المستعرضة على الأكتين وبدونه لا انقباض." },
+            { id: 8, type: 'mcq', score: 2, text: "السؤال 8 (درجتان): ما نوع العضلات الملساء التي تحافظ على ضغط الدم بالأوعية الدموية؟", options: ["مخططة إرادية", "غير مخططة ولاإرادية", "مخططة ولاإرادية", "غير مخططة وإرادية"], correct: 1, explanation: "عضلات جدر الأوعية ملساء غير مخططة وتعمل لاإرادياً." },
+            { id: 9, type: 'mcq', score: 2, text: "السؤال 9 (درجتان): علاج الشد العضلي الناتج عن النقص الشديد في ATP يكون بـ:", options: ["حقن صوديوم", "توفير الأكسجين للتنفس الهوائي وإنتاج ATP", "زيادة أستيل كولين", "حقن لاكتيك"], correct: 1, explanation: "الأكسجين يتيح إنتاج ATP بكثرة لفصل الروابط المستعرضة وإحداث الانبساط." },
+            { id: 10, type: 'mcq', score: 2, text: "السؤال 10 (درجتان): أي مما يلي يتغير طوله أثناء الانقباض والانبساط العضلي؟", options: ["طول خيوط الميوسين", "طول خيوط الأكتين", "المسافة بين خطي Z والمنطقة H", "طول المنطقة الداكنة A"], correct: 2, explanation: "المسافة بين خطي Z والمنطقة H تقلان بالانقباض بينما أطوال الخيوط وA ثابتة." },
+            { id: 11, type: 'mcq', score: 1, text: "السؤال 11 (درجة واحدة): ما النتيجة المباشرة لتأثير إنزيم الكولين أستيريز؟", options: ["تحطيم أستيل كولين للعودة للراحة", "تفجير حويصلات التشابك", "دخول الصوديوم للداخل", "زيادة طول خيوط الميوسين"], correct: 0, explanation: "يحطم الإنزيم الناقل العصبي لتعود الليفة العضلية لحالة الاستقطاب والراحة." },
+            { id: 12, type: 'mcq', score: 1, text: "السؤال 12 (درجة واحدة): الغشاء الخلوي المحيط بسيتوبلازم الخلية العضلية يسمى:", options: ["الساركومير", "الساركوليما", "الساركو بلازم", "الوتر"], correct: 1, explanation: "الساركوليما هو الغشاء الخلوي المباشر المحيط بمكونات الخلية العضلية." },
+            { id: 13, type: 'mcq', score: 1, text: "السؤال 13 (درجة واحدة): عدد القطع العضلية المحصورة بين 7 خطوط Z متتالية يساوي:", options: ["7 قطع", "6 قطع", "8 قطع", "14 قطعة"], correct: 1, explanation: "عدد القطع = عدد خطوط Z - 1 = (7 - 1 = 6 قطع)." },
+            { id: 14, type: 'mcq', score: 1, text: "السؤال 14 (درجة واحدة): تتميز العضلات الملساء بجدار المعدة بأنها:", options: ["مخططة وإرادية", "غير مخططة ولاإرادية", "مخططة ولاإرادية", "إرادية وتتصل بالعظام"], correct: 1, explanation: "عضلات الأحشاء كالمعدة ملساء غير مخططة وتعمل بشكل لاإرادي." },
+            { id: 15, type: 'mcq', score: 1, text: "السؤال 15 (درجة واحدة): جهد الراحة (الاستقطاب) لغشاء الليفة العضلية يبلغ مقداره:", options: ["-70 مللي فولت", "+40 مللي فولت", "صفر", "+110 مللي فولت"], correct: 0, explanation: "فرق الجهد الكهربي في الراحة يساوي -70 مللي فولت." },
+            { id: 16, type: 'mcq', score: 1, text: "السؤال 16 (درجة واحدة): المادة الكيميائية التي تحرر عند نهايات المحور العصبي لتصل للساركوليما هي:", options: ["الكولين أستيريز", "الأستيل كولين", "حمض اللاكتيك", "الكولاجين"], correct: 1, explanation: "الأستيل كولين هو الناقل العصبي الكيميائي الرئيسي بالتشابك العضلي." },
+            { id: 17, type: 'mcq', score: 1, text: "السؤال 17 (درجة واحدة): يتراكم حمض اللاكتيك بالليفة العضلية نتيجة التنفس اللاهوائي عند نقص:", options: ["الجلوكوز", "الأكسجين", "ثاني أكسيد الكربون", "الصوديوم"], correct: 1, explanation: "نقص الأكسجين يجبر العضلة على التخمر اللاهوائي وتراكم اللاكتيك." },
+            { id: 18, type: 'mcq', score: 1, text: "السؤال 18 (درجة واحدة): الطاقة الناتجة من التخمر اللاهوائي لجزيء جلوكوز تكون قدرها:", options: ["38 ATP", "2 ATP", "36 ATP", "4 ATP"], correct: 1, explanation: "ينتج التخمر اللاهوائي 2 جزيء ATP فقط لكل جزيء جلوكوز." },
+            { id: 19, type: 'mcq', score: 1, text: "السؤال 19 (درجة واحدة): الخط الداكن الداعم الذي يتوسط المنطقة المضيئة I هو:", options: ["الخط A", "الخط Z", "الخط H", "الخط M"], correct: 1, explanation: "الخط Z يقطع منتصف كل منطقة مضيئة I باللييفة." },
+            { id: 20, type: 'mcq', score: 1, text: "السؤال 20 (درجة واحدة): يتراوح عدد اللييفات العضلية بالليفة العضلية الواحدة بين:", options: ["100 - 500", "1000 - 2000", "50 - 100", "5000 - 10000"], correct: 1, explanation: "تحوي كل ليفة عضلية من 1000 إلى 2000 لييفة عضلية." },
+            { id: 21, type: 'mcq', score: 1, text: "السؤال 21 (درجة واحدة): الغطاء الضام المحيط بمجموعة الألياف العضلية يسمى:", options: ["غشاء الحزمة", "الساركوليما", "الرباط", "الوتر"], correct: 0, explanation: "تجمع الألياف داخل حزم تحاط بغشاء نسيج ضام هو غشاء الحزمة." },
+            { id: 22, type: 'mcq', score: 1, text: "السؤال 22 (درجة واحدة): سحب خيوط الأكتين الانزلاقي يتم بواسطة الروابط المستعرضة الممتدة من:", options: ["الأكتين", "الميوسين", "خط Z", "الساركوليما"], correct: 1, explanation: "تمتد الروابط المستعرضة كخطاطيف من خيوط الميوسين لتسحب الأكتين." },
+            { id: 23, type: 'mcq', score: 1, text: "السؤال 23 (درجة واحدة): الوحدة التركيبية الأساسية للعضلة الهيكلية هي:", options: ["القطعة العضلية", "الليفة العضلية (الخلية)", "اللييفة", "الحزمة"], correct: 1, explanation: "الليفة العضلية هي الخلية والوحدة التركيبية للعضلة الهيكلية." },
+            { id: 24, type: 'mcq', score: 1, text: "السؤال 24 (درجة واحدة): تمتاز الخلية العضلية القلبية باحتوائها على:", options: ["أقراص بينية وخيوط مخططة", "عضلات إرادية ملساء", "عدم وجود أنوية", "أوتار عظمية"], correct: 0, explanation: "عضلة القلب مخططة لاإرادية وترتبط بأقراص بينية." },
+            { id: 25, type: 'mcq', score: 1, text: "السؤال 25 (درجة واحدة): المسافة بين كل خطين متتاليين Z يطلق عليها اسم:", options: ["المنطقة H", "الساركومير (القطعة العضلية)", "المنطقة A", "الحزمة"], correct: 1, explanation: "الساركومير هي القطعة المحصورة بين خطين متتاليين Z." },
+            { id: 26, type: 'mcq', score: 1, text: "السؤال 26 (درجة واحدة): ينتج عن تحطيم الأستيل كولين بفعل الكولين أستيريز المركبان:", options: ["كولين وحمض خليك", "جلوكوز ولاكتيك", "بيروفيك وماء", "صوديوم وبوتاسيوم"], correct: 0, explanation: "يحطم الكولين أستيريز الناقل إلى كولين وحمض خليك." },
+            { id: 27, type: 'mcq', score: 1, text: "السؤال 27 (درجة واحدة): تكون الشحنة الكهربية لغشاء الليفة العضلية من الخارج بالراحة:", options: ["سالبة", "موجبة", "متعادلة", "متغيرة"], correct: 1, explanation: "في حالة الاستقطاب يتراكم الصوديوم الخارجي فتكون الشحنة موجبة." },
+            { id: 28, type: 'mcq', score: 1, text: "السؤال 28 (درجة واحدة): الخيوط البروتينية السميكة بالمنطقة الداكنة تعرف بـ:", options: ["الأكتين", "الميوسين", "الكولاجين", "الكيوتين"], correct: 1, explanation: "الميوسين هي الخيوط البروتينية السميكة بالقطعة العضلية." },
+            { id: 29, type: 'mcq', score: 1, text: "السؤال 29 (درجة واحدة): تتصل العضلات الهيكلية بالعظام عن طريق تركيب متين يسمى:", options: ["الأربطة", "الأوتار", "المفاصل", "الغضاريف"], correct: 1, explanation: "ترتبط العضلات بالعظام لنقل الحركة بواسطة الأوتار." },
+            { id: 30, type: 'mcq', score: 1, text: "السؤال 30 (درجة واحدة): عند فتح مضخات نهايات المحور العصبي، تتفق للداخل أيونات:", options: ["الصوديوم", "الكالسيوم Ca2+", "البوتاسيوم", "الحديد"], correct: 1, explanation: "تدفق الكالسيوم للداخل يفجر حويصلات النواقل العصبية." },
+            { id: 31, type: 'mcq', score: 1, text: "السؤال 31 (درجة واحدة): أي العضلات التالية لا تعتبر عضلات ملساء؟", options: ["عضلات القناة الهضمية", "عضلات المثانة", "عضلات جدر الشرايين", "عضلات الساقين"], correct: 3, explanation: "عضلات الساقين عضلات هيكلية مخططة وإرادية." },
+            { id: 32, type: 'mcq', score: 1, text: "السؤال 32 (درجة واحدة): كمية الطاقة الناتجة من الأكسدة الهوائية التامة لجزيء جلوكوز هي:", options: ["2 ATP", "38 ATP", "12 ATP", "24 ATP"], correct: 1, explanation: "التنفس الهوائي التام ينشئ 38 جزيء ATP لكل جلوكوز." },
+            { id: 33, type: 'mcq', score: 1, text: "السؤال 33 (درجة واحدة): تحوي المنطقة شبه المضيئة H خيوط بروتينية من نوع:", options: ["أكتين فقط", "ميوسين فقط", "أكتين وميوسين", "لا تحوي خيوط"], correct: 1, explanation: "المنطقة H تحتوي على ميوسين فقط بمنتصف المنطقة A." },
+            { id: 34, type: 'mcq', score: 1, text: "السؤال 34 (درجة واحدة): يسمى البروتوبلازم والسيتوبلازم الخاص بالخلية العضلية باسم:", options: ["الساركوليما", "الساركو بلازم", "الساركومير", "السنتروسوم"], correct: 1, explanation: "الساركو بلازم هو سيتوبلازم الخلية العضلية." },
+            { id: 35, type: 'mcq', score: 1, text: "السؤال 35 (درجة واحدة): الحركة الهيكلية تحتاج لتكامل أجهزة وهي:", options: ["هيكلي وعصبي وعضلي", "تنفسي ودوري وهضمي", "هيكلي ودوري وتناسلي", "عصبي وهضمي ودوري"], correct: 0, explanation: "تتآزر الأجهزة الهيكلي والعصبي والعضلي لتأدية الحركة." },
+            { id: 36, type: 'mcq', score: 1, text: "السؤال 36 (درجة واحدة): تتكون المنطقة المضيئة I من خيوط بروتينية رفيعة تسمى:", options: ["الميوسين", "الأكتين", "الكيراتين", "الفيبرين"], correct: 1, explanation: "خيوط الأكتين الرفيعة تشكل المنطقة المضيئة I." },
+            { id: 37, type: 'mcq', score: 1, text: "السؤال 37 (درجة واحدة): بعد تحطيم الأستيل كولين يعود جهد الغشاء لوضع الراحة وهو:", options: ["+40 mV", "-70 mV", "صفر", "+110 mV"], correct: 1, explanation: "يعود فرق الجهد لوضعه الطبيعي في الراحة (-70 mV)." },
+            { id: 38, type: 'mcq', score: 1, text: "السؤال 38 (درجة واحدة): يتسبب التعب والإجهاد العضلي عن تراكم حمض:", options: ["الخليك", "اللاكتيك", "اليوريك", "الليمونيك"], correct: 1, explanation: "حمض اللاكتيك الناتج من التخمر يتراكم مسبباً إجهاد العضلة." },
+            { id: 39, type: 'mcq', score: 1, text: "السؤال 39 (درجة واحدة): تستمد الروابط المستعرضة طاقتها لسحب الأكتين من جزيئات:", options: ["GTP", "ATP", "ADP", "NADH"], correct: 1, explanation: "تستخدم الروابط طاقة ATP لسحب خيوط الأكتين نحو مركز القطعة." },
+            { id: 40, type: 'mcq', score: 1, text: "السؤال 40 (درجة واحدة): يزول الشد العضلي المؤلم عند الراحة وتوفر كميات كافية من:", options: ["الأكسجين والجلوكوز", "الصوديوم", "الكالسيوم", "اللاكتيك"], correct: 0, explanation: "يوفر الأكسجين إمكانية التنفس الهوائي لإنتاج ATP وفصل الروابط." },
+            { id: 41, type: 'tf', score: 1, text: "السؤال 41 (صواب أو خطأ): يتغير طول خيوط الأكتين والميوسين نفسها أثناء الانقباض العضلي.", options: ["صواب", "خطأ"], correct: 1, explanation: "أطوال الخيوط ثابتة ولكنها تنزلق فوق بعضها فقط طبقاً لنظرية هكسلي." },
+            { id: 42, type: 'tf', score: 1, text: "السؤال 42 (صواب أو خطأ): الخلية العضلية الهيكلية خلية متعددة الأنوية.", options: ["صواب", "خطأ"], correct: 0, explanation: "تتميز الألياف العضلية الهيكلية باحتوائها على أنوية متعددة بالبروتوبلازم." },
+            { id: 43, type: 'tf', score: 1, text: "السؤال 43 (صواب أو خطأ): يظل طول المنطقة الداكنة A ثابتاً أثناء الانقباض والانبساط.", options: ["صواب", "خطأ"], correct: 0, explanation: "المنطقة A تساوي طول خيوط الميوسين وهي لا تتغير مطلقاً." },
+            { id: 44, type: 'tf', score: 1, text: "السؤال 44 (صواب أو خطأ): غياب الكولين أستيريز يبقي غشاء الليفة العضلية في حالة لااستقطاب دائم.", options: ["صواب", "خطأ"], correct: 0, explanation: "بدون الكولين أستيريز يستمر الناقل بالعمل فلا تعود العضلة للراحة." },
+            { id: 45, type: 'tf', score: 1, text: "السؤال 45 (صواب أو خطأ): تنقبض العضلات الملساء إرادياً بطلب من الكائن الحي.", options: ["صواب", "خطأ"], correct: 1, explanation: "العضلات الملساء عضلات لاإرادية لا تخضع لإرادة الكائن." },
+            { id: 46, type: 'tf', score: 1, text: "السؤال 46 (صواب أو خطأ): تحرر الناقل العصبي بالتشابك يتطلب تدفق أيونات الكالسيوم.", options: ["صواب", "خطأ"], correct: 0, explanation: "أيونات الكالسيوم ضرورية لتفجير الحويصلات وتحرير الناقل العصبي." },
+            { id: 47, type: 'tf', score: 1, text: "السؤال 47 (صواب أو خطأ): تربط الأربطة العضلات بالعظام لنقل الحركة.", options: ["صواب", "خطأ"], correct: 1, explanation: "الأوتار هي التي تربط العضلات بالعظام بينما الأربطة تربط عظام بعظام." },
+            { id: 48, type: 'tf', score: 1, text: "السؤال 48 (صواب أو خطأ): يقل طول الساركومير عند الانقباض العضلي لتقارب خطي Z.", options: ["صواب", "خطأ"], correct: 0, explanation: "تقترب الخطوط Z من بعضها البعض فيقل طول الساركومير بالانقباض." },
+            { id: 49, type: 'tf', score: 1, text: "السؤال 49 (صواب أو خطأ): يتكون حمض اللاكتيك بالليفة العضلية أثناء التنفس الهوائي الطبيعي.", options: ["صواب", "خطأ"], correct: 1, explanation: "يتكون اللاكتيك فقط عند التنفس اللاهوائي بسبب نقص الأكسجين." },
+            { id: 50, type: 'tf', score: 1, text: "السؤال 50 (صواب أو خطأ): تستهلك العضلة طاقة ATP في كل من الانقباض والانبساط.", options: ["صواب", "خطأ"], correct: 0, explanation: "تستعمل ATP لسحب الخيوط عند الانقباض وفصل الروابط عند الانبساط." }
+        ];
+
+        const userAnswers = new Array(50).fill(null);
+        let studentNameVal = "";
+        let studentCodeVal = "";
+
+        window.onload = function() {
+            if (sessionStorage.getItem('exam_in_progress') === 'true') {
+                sessionStorage.removeItem('exam_in_progress');
+                let activeCode = sessionStorage.getItem('active_student_code');
+                if (activeCode) localStorage.setItem('invalidated_code_' + activeCode, 'true');
+                sendEmailReport("تحديث الصفحة (Refresh)", 0, "إلغاء فوري بسبب تحديث الصفحة");
+                alert('⚠️ تم رصد عمل تحديث (Refresh) للصفحة أثناء الاختبار! تم إلغاء الاختبار وتوثيق التقرير.');
+            }
+        };
+
+        function startExam() {
+            studentNameVal = document.getElementById('studentName').value.trim();
+            studentCodeVal = document.getElementById('studentCode').value.trim();
+
+            if(studentNameVal.split(' ').length < 3) {
+                alert('الرجاء إدخال الاسم ثلاثياً بدقة!');
+                return;
+            }
+            const codeNum = parseInt(studentCodeVal);
+            if(isNaN(codeNum) || codeNum < 100 || codeNum > 199) {
+                alert('كود غير صحيح، يرجى التأكد من الكود المرفق من المعلم!');
+                return;
+            }
+
+            if(localStorage.getItem('invalidated_code_' + codeNum)) {
+                alert('❌ هذا الكود تم إلغاؤه مسبقاً بسبب عمل تحديث (Refresh) أثناء الاختبار!');
+                return;
+            }
+
+            if(localStorage.getItem('used_code_' + codeNum)) {
+                alert('هذا الكود مستخدم مسبقاً من هذا الجهاز!');
+                return;
+            }
+
+            localStorage.setItem('used_code_' + codeNum, 'active');
+            sessionStorage.setItem('exam_in_progress', 'true');
+            sessionStorage.setItem('active_student_code', codeNum);
+
+            document.getElementById('loginBox').classList.remove('active');
+            document.getElementById('examBox').classList.add('active');
+            document.getElementById('studentInfoDisp').innerText = `الطالب: ${studentNameVal}`;
+
+            initNav();
+            loadQuestion(0);
+            startTimer();
+
+            document.addEventListener("visibilitychange", handleVisibilityChange);
+            window.addEventListener("blur", handleFocusLoss);
+        }
+
+        function handleVisibilityChange() {
+            if (document.hidden) registerViolation("مغادرة الشاشة / التبديل لتطبيق آخر");
+        }
+
+        function handleFocusLoss() {
+            document.getElementById('mainContainer').classList.add('blurred');
+            registerViolation("فقدان التركيز على الصفحة");
+            setTimeout(() => { document.getElementById('mainContainer').classList.remove('blurred'); }, 1500);
+        }
+
+        function registerViolation(reason) {
+            violationCount--;
+            const alertBox = document.getElementById('warningAlert');
+            alertBox.style.display = 'block';
+            document.getElementById('violationCount').innerText = violationCount;
+
+            if (violationCount <= 0) forceAutoSubmitdueToCheat(reason);
+        }
+
+        function forceAutoSubmitdueToCheat(reason) {
+            sessionStorage.removeItem('exam_in_progress');
+            alert(`⚠️ تم إلغاء اختبارك تلقائياً لتجاوز محاولات الخروج (${reason})!`);
+            
+            let totalScore = calculateScore();
+            sendEmailReport("إلغاء بسبب الغش/الخروج", totalScore, reason);
+
+            localStorage.setItem('student_score_stored', totalScore);
+            document.getElementById('examBox').classList.remove('active');
+            document.getElementById('resultBox').classList.add('active');
+            document.getElementById('resultHeader').innerText = "تم إلغاء الاختبار لتجاوز محاولات الخروج!";
+            document.getElementById('resultHeader').style.color = "#fc8181";
+        }
+
+        function initNav() {
+            const nav = document.getElementById('qNav');
+            nav.innerHTML = '';
+            questions.forEach((q, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'q-num-btn';
+                btn.id = `navBtn_${idx}`;
+                btn.innerText = q.id;
+                btn.onclick = () => loadQuestion(idx);
+                nav.appendChild(btn);
+            });
+        }
+
+        function loadQuestion(idx) {
+            currentQ = idx;
+            document.querySelectorAll('.q-num-btn').forEach((b, i) => {
+                b.classList.remove('active');
+                if(i === idx) b.classList.add('active');
+            });
+
+            const q = questions[idx];
+            const container = document.getElementById('questionContainer');
+            
+            let html = `
+                <div class="question-card">
+                    <div class="question-title">${q.text}</div>
+            `;
+
+            if(q.hasDiagram) {
+                html += `<div class="diagram-box"><canvas id="qCanvas" width="400" height="150"></canvas></div>`;
+            }
+
+            q.options.forEach((opt, oIdx) => {
+                let checked = userAnswers[idx] === oIdx ? 'checked' : '';
+                html += `
+                    <label class="option-label" id="opt_${oIdx}">
+                        <input type="radio" name="qOpt" value="${oIdx}" ${checked} onclick="selectAnswer(${idx}, ${oIdx})"> ${opt}
+                    </label>
+                `;
+            });
+
+            html += `
+                    <div class="tools-bar">
+                        <button class="tool-btn" onclick="useEliminate()">حذف إجابتين ❌</button>
+                        <button class="tool-btn" onclick="useHint()">تلميح ذكي 💡 (<span id="hintsCount">${hintsLeft}</span> متبقي)</button>
+                    </div>
+                    <div id="hintBox" style="margin-top: 10px; color: #4fd1c5; font-size: 13px; display:none;"></div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            if(q.hasDiagram) {
+                drawDiagram(q.hasDiagram);
+            }
+        }
+
+        function drawDiagram(type) {
+            const c = document.getElementById('qCanvas');
+            if(!c) return;
+            const ctx = c.getContext('2d');
+            ctx.clearRect(0, 0, c.width, c.height);
+
+            if(type === 'graph_action_potential') {
+                ctx.strokeStyle = '#d4af37';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(30, 120); ctx.lineTo(100, 120);
+                ctx.lineTo(180, 20); ctx.lineTo(260, 130);
+                ctx.lineTo(370, 120); ctx.stroke();
+
+                ctx.fillStyle = '#4fd1c5';
+                ctx.font = '12px Tahoma';
+                ctx.fillText('+40 mV (إثارة)', 190, 25);
+                ctx.fillText('-70 mV (راحة)', 35, 115);
+            } else if(type === 'fatigue_curve') {
+                ctx.strokeStyle = '#fc8181';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(30, 30); ctx.lineTo(350, 130); ctx.stroke();
+                ctx.fillStyle = '#68d391';
+                ctx.fillText('تراكم حمض اللاكتيك واستنزاف ATP', 100, 70);
+            }
+        }
+
+        function selectAnswer(qIdx, optIdx) {
+            userAnswers[qIdx] = optIdx;
+            document.getElementById(`navBtn_${qIdx}`).classList.add('answered');
+        }
+
+        function nextQuestion() { if(currentQ < questions.length - 1) loadQuestion(currentQ + 1); }
+        function prevQuestion() { if(currentQ > 0) loadQuestion(currentQ - 1); }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                let m = Math.floor(timerSeconds / 60);
+                let s = timerSeconds % 60;
+                document.getElementById('timerDisplay').innerText = `الوقت المتبقي: ${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+
+                if(timerSeconds > 0 && timerSeconds % 600 === 0) {
+                    if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+                    alert('تنبيه وقت: مرّت 10 دقائق من وقت الاختبار!');
+                }
+
+                if(timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    alert('انتهى الوقت المحدد للاختبار!');
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function useEliminate() {
+            if(usedEliminate) { alert('استخدمت ميزة حذف إجابتين مسبقاً!'); return; }
+            usedEliminate = true;
+            const q = questions[currentQ];
+            if(q.type === 'tf') { alert('غير متاحة لأسئلة صواب وخطأ'); return; }
+            let wrongOpts = [];
+            q.options.forEach((_, idx) => { if(idx !== q.correct) wrongOpts.push(idx); });
+            if(wrongOpts.length > 0) {
+                document.getElementById(`opt_${wrongOpts[0]}`).style.display = 'none';
+                alert('تم حذف إجابة خاطئة بنجاح!');
+            }
+        }
+
+        function useHint() {
+            if(hintsLeft <= 0) { alert('استنفدت جميع التلميحات!'); return; }
+            hintsLeft--;
+            document.getElementById('hintsCount').innerText = hintsLeft;
+            const hintBox = document.getElementById('hintBox');
+            hintBox.style.display = 'block';
+            hintBox.innerText = `💡 تلميح: ركز على تغير الشحنات ومستويات الجهد ومصدر الطاقة ATP بالخلية!`;
+        }
+
+        function calculateScore() {
+            let score = 0;
+            questions.forEach((q, idx) => {
+                if(userAnswers[idx] === q.correct) score += q.score;
+            });
+            return score;
+        }
+
+        function submitExam() {
+            sessionStorage.removeItem('exam_in_progress');
+            clearInterval(timerInterval);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            window.removeEventListener("blur", handleFocusLoss);
+
+            let totalScore = calculateScore();
+            sendEmailReport("تسليم رسمي ناجح", totalScore, "تم تسليم الاختبار بنجاح كاملاً");
+
+            localStorage.setItem('student_score_stored', totalScore);
+            document.getElementById('examBox').classList.remove('active');
+            document.getElementById('resultBox').classList.add('active');
+        }
+
+        function sendEmailReport(status, score, details) {
+            let answeredCount = userAnswers.filter(a => a !== null).length;
+            
+            document.getElementById('f_name').value = studentNameVal;
+            document.getElementById('f_code').value = studentCodeVal;
+            document.getElementById('f_status').value = status;
+            document.getElementById('f_score').value = score + " / 60";
+            document.getElementById('f_answered').value = answeredCount + " من 50";
+            document.getElementById('f_details').value = details;
+
+            const form = document.getElementById('emailForm');
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            }).then(response => {
+                console.log("تم إرسال التقرير البريدي بنجاح لإيميلك aseer010moh@gmail.com!");
+            }).catch(error => {
+                console.log("خطأ في الإرسال:", error);
+            });
+        }
+
+        function revealScore() {
+            const code = document.getElementById('teacherCodeInput').value.trim();
+            if(code === MASTER_TEACHER_CODE) {
+                let score = localStorage.getItem('student_score_stored') || 0;
+                document.getElementById('scoreDisplay').innerText = `الدرجة النهائية للسيّد الطالب: ${score} من 60 درجة ⭐`;
+
+                const revContainer = document.getElementById('reviewContainer');
+                revContainer.style.display = 'block';
+                let revHtml = `<h4 style="color: #4fd1c5; text-align: center;">مراجعة الإجابات والتصحيح النموذجي</h4>`;
+
+                questions.forEach((q, idx) => {
+                    let uAns = userAnswers[idx];
+                    let isCorrect = uAns === q.correct;
+                    let uAnsText = uAns !== null ? q.options[uAns] : "لم يتم الإجابة";
+                    let cAnsText = q.options[q.correct];
+
+                    revHtml += `
+                        <div class="review-box" style="border-right: 4px solid ${isCorrect ? '#68d391' : '#fc8181'};">
+                            <div style="font-weight: bold; color: #d4af37;">${q.text}</div>
+                            <div style="margin-top: 5px; font-size: 13px;">إجابة الطالب: <span style="color: ${isCorrect ? '#68d391' : '#fc8181'}; font-weight: bold;">${uAnsText}</span></div>
+                            ${!isCorrect ? `<div style="font-size: 13px; color: #68d391;">الإجابة الصحيحة: ${cAnsText}</div>` : ''}
+                            <div style="font-size: 12px; color: #a0aec0; margin-top: 5px;">💡 التفسير العلمي: ${q.explanation}</div>
+                        </div>
+                    `;
+                });
+                revContainer.innerHTML = revHtml;
+                document.getElementById('teacherInputArea').style.display = 'none';
+            } else {
+                alert('كود المعلم غير صحيح!');
+            }
+        }
+    </script>
+</body>
+</html>
